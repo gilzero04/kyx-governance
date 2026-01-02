@@ -1,10 +1,13 @@
 use crate::core::database::Database;
 use std::fs;
 use std::path::Path;
+use serde::Deserialize;
 
-const MIGRATION_DIR: &str = "/migrations";
+// Remove const MIGRATION_DIR
+// const MIGRATION_DIR: &str = "/migrations";
 
-#[derive(serde::Deserialize)]
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct MigrationRecord {
     id: surrealdb::sql::Thing,
     name: String,
@@ -12,7 +15,8 @@ struct MigrationRecord {
 }
 
 pub async fn apply_migrations(db: &Database) -> std::io::Result<()> {
-    log::info!("🔄 Checking for pending migrations in {}...", MIGRATION_DIR);
+    let migration_dir = std::env::var("MIGRATION_DIR").unwrap_or_else(|_| "migrations".to_string());
+    log::info!("🔄 Checking for pending migrations in {}...", migration_dir);
 
     // 1. Ensure _migrations table exists
     let _ = db.query("DEFINE TABLE _migrations SCHEMAFULL;").await;
@@ -21,8 +25,8 @@ pub async fn apply_migrations(db: &Database) -> std::io::Result<()> {
     let _ = db.query("DEFINE INDEX migration_name ON _migrations FIELDS name UNIQUE;").await;
 
     // 2. Read all files in migrations directory
-    let entries = fs::read_dir(MIGRATION_DIR).map_err(|e| {
-        log::error!("❌ Failed to read migration directory: {}", e);
+    let entries = fs::read_dir(&migration_dir).map_err(|e| {
+        log::error!("❌ Failed to read migration directory '{}': {}", migration_dir, e);
         e
     })?;
 
@@ -69,7 +73,12 @@ pub async fn apply_migrations(db: &Database) -> std::io::Result<()> {
 
         // Apply migration
         log::info!("🚀 Applying migration: {}", file_name);
-        let content = fs::read_to_string(Path::new(MIGRATION_DIR).join(&file_name))?;
+        
+        let file_path = Path::new(&migration_dir).join(&file_name);
+        let content = fs::read_to_string(&file_path).map_err(|e| {
+             log::error!("❌ Failed to read migration file {:?}: {}", file_path, e);
+             e
+        })?;
         
         // Execute the migration content
         let mut response = match db.query(&content).await {

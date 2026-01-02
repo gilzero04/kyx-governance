@@ -1,16 +1,14 @@
 # =============================================================================
-# Kyx MCP Server - Docker Compose
+# Kyx Governance Server - Docker Compose
 # =============================================================================
 # Development/Production deployment configuration with SurrealDB dependency
 # =============================================================================
 
 services:
-  kyx-mcp:
+  kyx-governance:
     build:
       context: .
       dockerfile: Dockerfile
-  kyx-governance:
-    build: .
     image: kyx-governance:latest
     container_name: kyx-governance
     restart: unless-stopped
@@ -18,13 +16,20 @@ services:
       - "${PORT:-3001}:3001"
     environment:
       - RUST_LOG=${RUST_LOG:-info}
-      - SURREAL_URL=${SURREAL_URL:-ws://kyx-governance-surrealdb:8000}
+      # SurrealDB Connection
+      - SURREAL_URL=ws://kyx-governance-surrealdb:8000/rpc
       - SURREAL_USER=${SURREAL_USER:-root}
-      - SURREAL_PASS=${SURREAL_PASS:-devpassword123}
+      - SURREAL_PASS=${SURREAL_PASS:-c31256bbba78c60c09cfa90c65fb533b96fd1bb27a22be2f}
       - SURREAL_NAMESPACE=${SURREAL_NAMESPACE:-kyx}
       - SURREAL_DATABASE=${SURREAL_DATABASE:-governance}
+      # Authentication
       - MCP_API_KEY=${MCP_API_KEY}
     depends_on:
+      surrealdb:
+        condition: service_healthy
+    networks:
+      - kyx-network
+    healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:3001/health || exit 1"]
       interval: 30s
       timeout: 10s
@@ -34,17 +39,17 @@ services:
   # SurrealDB for Governance Data
   surrealdb:
     image: surrealdb/surrealdb:v2.4.0
-    container_name: kyx-mcp-surrealdb
+    container_name: kyx-governance-surrealdb
     restart: unless-stopped
     user: root
-    command: start --user ${SURREAL_USER:-root} --pass ${SURREAL_PASS:-password} rocksdb:/var/lib/surreal/data.db
+    command: start --user ${SURREAL_USER:-root} --pass ${SURREAL_PASS:-c31256bbba78c60c09cfa90c65fb533b96fd1bb27a22be2f} rocksdb:/var/lib/surreal/data.db
     volumes:
       - surreal-data:/var/lib/surreal
     ports:
       - "${SURREAL_PORT:-8000}:8000"
     environment:
       SURREAL_USER: ${SURREAL_USER:-root}
-      SURREAL_PASS: ${SURREAL_PASS:-password}
+      SURREAL_PASS: ${SURREAL_PASS:-c31256bbba78c60c09cfa90c65fb533b96fd1bb27a22be2f}
     networks:
       - kyx-network
     healthcheck:

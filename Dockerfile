@@ -1,5 +1,5 @@
 # =============================================================================
-# Kyx MCP Server - Multi-stage Dockerfile
+# Kyx Governance Server - Multi-stage Dockerfile
 # =============================================================================
 # Stage 1: Build - Uses Rust nightly (for edition2024 support)
 # Stage 2: Runtime - Debian slim with required libraries
@@ -24,20 +24,10 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 
-# Copy dependency files first for better caching
-COPY Cargo.toml Cargo.lock ./
+# Copy all source files
+COPY . .
 
-# Create dummy main.rs for dependency caching
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-
-# Build dependencies (this layer will be cached)
-RUN cargo build --release && rm -rf src target/release/kyx-governance*
-
-# Copy actual source code
-COPY src ./src
-COPY migrations ./migrations
-
-# Build the actual application
+# Build the release binary
 RUN cargo build --release --bin kyx-governance
 
 
@@ -65,7 +55,7 @@ LABEL org.opencontainers.image.vendor="Kyx Tech"
 RUN groupadd -r kyx && useradd -r -g kyx kyx
 
 # Copy the compiled binary from builder
-COPY --from=builder /app/target/release/kyx-mcp /usr/local/bin/kyx-mcp
+COPY --from=builder /app/target/release/kyx-governance /usr/local/bin/kyx-governance
 
 # Copy migrations for auto-seeding
 COPY --from=builder /app/migrations /migrations
@@ -80,9 +70,10 @@ EXPOSE 3001
 USER kyx
 
 # Set default environment variables
-ENV MCP_TRANSPORT=http
+ENV MCP_TRANSPORT=hybrid
+ENV MIGRATION_DIR=/migrations
 ENV PORT=3001
 ENV RUST_LOG=info
 
 # Run the binary
-ENTRYPOINT ["/usr/local/bin/kyx-mcp"]
+ENTRYPOINT ["/usr/local/bin/kyx-governance"]

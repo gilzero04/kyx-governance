@@ -24,11 +24,11 @@ impl Config {
                 .parse()
                 .expect("PORT must be a number"),
             surreal_url: env::var("SURREAL_URL")
-                .unwrap_or_else(|_| "http://127.0.0.1:8000/rpc".to_string()),
-            surreal_user: env::var("SURREAL_USER").expect("SURREAL_USER must be set"),
-            surreal_pass: env::var("SURREAL_PASS").expect("SURREAL_PASS must be set"),
-            surreal_ns: env::var("SURREAL_NAMESPACE").expect("SURREAL_NAMESPACE must be set"),
-            surreal_db: env::var("SURREAL_DATABASE").expect("SURREAL_DATABASE must be set"),
+                .unwrap_or_else(|_| "ws://127.0.0.1:8000/rpc".to_string()),
+            surreal_user: env::var("SURREAL_USER").unwrap_or_else(|_| "root".to_string()),
+            surreal_pass: env::var("SURREAL_PASS").unwrap_or_else(|_| "c31256bbba78c60c09cfa90c65fb533b96fd1bb27a22be2f".to_string()),
+            surreal_ns: env::var("SURREAL_NAMESPACE").unwrap_or_else(|_| "kyx".to_string()),
+            surreal_db: env::var("SURREAL_DATABASE").unwrap_or_else(|_| "governance".to_string()),
             // Optional: if set, requires Bearer token authentication
             mcp_api_key: env::var("MCP_API_KEY").ok().filter(|s| !s.is_empty()),
             jwt_secret: env::var("JWT_SECRET").unwrap_or_else(|_| "dev-secret".to_string()),

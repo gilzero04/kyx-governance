@@ -18,9 +18,18 @@ Add the following to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
+    "svelte": {
+      "serverUrl": "https://mcp.svelte.dev/mcp"
+    },
     "kyx-governance": {
       "command": "/absolute/path/to/kyx-governance/run-mcp.sh",
       "args": []
+    },
+    "kyx-governance-remote": {
+      "serverUrl": "http://localhost:3001/mcp",
+      "headers": {
+        "Authorization": "Bearer 1302b59526ca09b134c8baf4245133fe170e2018f3e9280c88dc86b069b36068"
+      }
     }
   }
 }

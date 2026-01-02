@@ -19,6 +19,30 @@ pub struct JsonRpcResponse {
     pub error: Option<JsonRpcError>,
 }
 
+impl JsonRpcResponse {
+    pub fn success(result: Value, id: Option<Value>) -> Self {
+        Self {
+            jsonrpc: "2.0".to_string(),
+            id: id.unwrap_or(serde_json::json!(null)),
+            result: Some(result),
+            error: None,
+        }
+    }
+
+    pub fn error(code: i32, message: &str, id: Option<Value>) -> Self {
+        Self {
+            jsonrpc: "2.0".to_string(),
+            id: id.unwrap_or(serde_json::json!(null)),
+            result: None,
+            error: Some(JsonRpcError {
+                code,
+                message: message.to_string(),
+                data: None,
+            }),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JsonRpcError {
     pub code: i32,
