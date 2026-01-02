@@ -1,0 +1,42 @@
+# Build artifacts
+target/
+debug/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+docs/
+
+# Backup
+backup_src/
+
+# Environment (don't include in image - use runtime env vars)
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Test files
+tests/
+*_test.rs

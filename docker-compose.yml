@@ -1,0 +1,62 @@
+# =============================================================================
+# Kyx MCP Server - Docker Compose
+# =============================================================================
+# Development/Production deployment configuration with SurrealDB dependency
+# =============================================================================
+
+services:
+  kyx-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+  kyx-governance:
+    build: .
+    image: kyx-governance:latest
+    container_name: kyx-governance
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+      - SURREAL_URL=${SURREAL_URL:-ws://kyx-governance-surrealdb:8000}
+      - SURREAL_USER=${SURREAL_USER:-root}
+      - SURREAL_PASS=${SURREAL_PASS:-devpassword123}
+      - SURREAL_NAMESPACE=${SURREAL_NAMESPACE:-kyx}
+      - SURREAL_DATABASE=${SURREAL_DATABASE:-governance}
+      - MCP_API_KEY=${MCP_API_KEY}
+    depends_on:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # SurrealDB for Governance Data
+  surrealdb:
+    image: surrealdb/surrealdb:v2.4.0
+    container_name: kyx-mcp-surrealdb
+    restart: unless-stopped
+    user: root
+    command: start --user ${SURREAL_USER:-root} --pass ${SURREAL_PASS:-password} rocksdb:/var/lib/surreal/data.db
+    volumes:
+      - surreal-data:/var/lib/surreal
+    ports:
+      - "${SURREAL_PORT:-8000}:8000"
+    environment:
+      SURREAL_USER: ${SURREAL_USER:-root}
+      SURREAL_PASS: ${SURREAL_PASS:-password}
+    networks:
+      - kyx-network
+    healthcheck:
+      test: ["CMD", "/surreal", "isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  kyx-network:
+    driver: bridge
+
+volumes:
+  surreal-data:
