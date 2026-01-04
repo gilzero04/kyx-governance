@@ -6,21 +6,16 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Stage 1: Builder (Rust nightly)
+# Stage 1: Builder (Rust 1.92 stable)
 # -----------------------------------------------------------------------------
-FROM debian:bookworm-slim AS builder
+FROM rust:1.92-slim-bookworm AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
     pkg-config \
     libssl-dev \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
-
-# Install Rust nightly via rustup
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 

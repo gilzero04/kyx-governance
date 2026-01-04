@@ -1,6 +1,6 @@
 use governor::{Quota, RateLimiter as GovernorRateLimiter, state::{InMemoryState, NotKeyed}, clock::DefaultClock};
 use nonzero_ext::nonzero;
-use std::num::NonZeroU32;
+// use std::num::NonZeroU32;
 use anyhow::{Result, anyhow};
 use std::sync::Arc;
 use std::collections::HashMap;
@@ -18,6 +18,7 @@ pub struct RateLimiter {
     user_limiters: Arc<Mutex<HashMap<String, GovernorRateLimiter<NotKeyed, InMemoryState, DefaultClock>>>>,
 }
 
+#[allow(dead_code)]
 impl RateLimiter {
     pub fn new() -> Self {
         Self {
@@ -68,7 +69,7 @@ impl RateLimiter {
     }
     
     /// Get current user request count
-    pub fn user_remaining(&self, user_id: &str) -> u32 {
+    pub fn user_remaining(&self, _user_id: &str) -> u32 {
         // Placeholder for future metrics
         100
     }

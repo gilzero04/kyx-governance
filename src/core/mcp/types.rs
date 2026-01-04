@@ -25,6 +25,7 @@ pub struct Tool {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(skip_serializing)]
+    #[allow(dead_code)]
     pub title: Option<String>,
     pub description: String,
     #[serde(alias = "input_schema")]

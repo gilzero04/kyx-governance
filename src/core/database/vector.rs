@@ -33,6 +33,7 @@ struct QdrantVectorParams {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct QdrantCollectionInfo {
     result: Option<serde_json::Value>,
 }
@@ -185,7 +186,7 @@ impl VectorStore {
         let embedding = self.get_embedding(text).await?;
         
         // Merge content into metadata
-        let mut payload = match metadata {
+        let payload = match metadata {
             serde_json::Value::Object(mut map) => {
                 map.insert("content".to_string(), serde_json::Value::String(text.to_string()));
                 serde_json::Value::Object(map)

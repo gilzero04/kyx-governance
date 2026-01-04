@@ -257,7 +257,7 @@ impl McpHandler {
                         bind_project = Some(thing);
                     } else {
                         // Lookup by name
-                         let mut p_query = self.db.query("SELECT id FROM mcp_projects WHERE name = $name LIMIT 1")
+                         let p_query = self.db.query("SELECT id FROM mcp_projects WHERE name = $name LIMIT 1")
                             .bind(("name", s.to_string()))
                             .await.ok();
                         if let Some(mut pq) = p_query {

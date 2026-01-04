@@ -12,6 +12,7 @@ pub struct GovernanceDocument {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct GovernanceRule {
     pub title: String,
     pub content: String,

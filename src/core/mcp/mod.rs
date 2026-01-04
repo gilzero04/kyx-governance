@@ -29,6 +29,7 @@ impl JsonRpcResponse {
         }
     }
 
+    #[allow(dead_code)]
     pub fn error(code: i32, message: &str, id: Option<Value>) -> Self {
         Self {
             jsonrpc: "2.0".to_string(),

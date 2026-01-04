@@ -1,14 +1,14 @@
 [package]
 name = "kyx-governance"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 # Web Framework & Runtime (Ultra-Native) - Matching kyx-kernel
 ntex = { version = "2.17", features = ["tokio"] }
 ntex-rt = "3.2"
 ntex-util = "3.2"
-ntex-cors = "2.0"
+ntex-cors = "2.1"
 
 # Async & Utilities
 tokio = { version = "1", features = ["full"] }
