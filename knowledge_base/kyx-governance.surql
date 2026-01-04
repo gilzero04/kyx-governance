@@ -1,5 +1,5 @@
 -- Kyx Governance Snapshot: kyx-governance
--- Generated at: 2026-01-04T02:22:41.357180555Z
+-- Generated at: 2026-01-04T02:25:21.531670337Z
 -- Documents found: 10
 
 USE NS kyx; USE DB governance;
@@ -90,6 +90,7 @@ UPSERT mcp_documentation:nmry3112r9idv5o8b3fh CONTENT { name: 'summary-report', 
 2. **Stability**: Resolved \"Agent terminated\" errors by standardizing on MCP SSE protocol.
 3. **Transparency**: Added full audit logging for all tool executions.
 4. **Data Integrity**: Verified the 10-document knowledge base standard and fixed the export/import snapshot tools.
+5. **AI Handshake**: Established the **AI Handshake Protocol** to ensure tools are used automatically.
 
 ### ⚠️ Post-Mortem: The Session Management Issue
 Throughout development, a critical failure point was identified: **The \"Session Fallacy\"**.
@@ -97,12 +98,53 @@ Throughout development, a critical failure point was identified: **The \"Session
 - **The Cause**: MCP is designed for **stateless tool execution**. When the server attempted to manage internal conversation state, it deviated from the JSON-RPC standard expected by the agent, leading to connection drops.
 - **The Fix**: Removed all session management tools. Hardened the SSE transport to be purely stateless. This move improved stability by 100%.
 
-### 🚀 Future Development Roadmap
+### 🚀 AI Integration Guide
+- **Handshake Prompt**: Added Section 5 to the `operation-guide` providing the exact prompt to trigger automatic MCP usage by AI agents.
+
+### 🛠️ Future Development Roadmap
 1. **Real-time Monitoring**: (Phase 5) Build a dashboard for live audit logs and system metrics.
 2. **Automatic Vector Updates**: Implement file watchers to auto-index documents upon change.
 3. **Advanced Multi-Tenancy**: Improve project data isolation using SurrealDB IAM roles.
 4. **Resilient Local Fallback**: Automated sync from Hub to local `.surql` for offline use.' };
-UPSERT mcp_documentation:hmk7gvy1obc45pzn2xrx CONTENT { name: 'operation-guide', title: 'Eco-system Operation & Usage Guide', sdlc_phase: 'maintenance', mimeType: 'text/markdown', project_id: mcp_projects:governance, content: '# Eco-system Operation & Usage Guide... (Verified)' };
+UPSERT mcp_documentation:6yxpvn9slo7huwwjhtbo CONTENT { name: 'operation-guide', title: 'Eco-system Operation & Usage Guide', sdlc_phase: 'maintenance', mimeType: 'text/markdown', project_id: mcp_projects:governance, content: '# Eco-system Operation & Usage Guide
+
+## 1. Data Persistence & Migrations
+- **Nature of DB**: The governance data is metadata-driven. Any changes to files in `/migrations` (tools, rules, documentation) require the database to be re-seeded.
+- **Apply Changes**: To apply new metadata or schema changes:
+  ```bash
+  docker compose down -v && docker compose up -d --build
+  ```
+
+## 2. API Reference & Documentation
+- **Metadata-Hub**: All APIรายละเอียด (API Specs), Schema และกฎเกณฑ์ (Rules) ถูกเก็บไว้ที่นี่แบบรวมศูนย์
+- **เครื่องมือหลัก**: `list-documentation`, `list-database-schema`, `list-active-rules`
+
+## 3. Incident Management
+- ก่อนเริ่มงานทุกครั้ง: ค้นหาปัญหาที่เคยเจอด้วย `search-governance query=\'...\'`
+- บันทึกปัญหาใหม่ทันที: ใช้ `report-incident`
+
+## 4. Remote Synchronization Protocol
+- **Cycle**: DATA Hub <-> Local Snapshot (`.surql`)
+- ใช้ `export-snapshot` เพื่อดึงข้อมูลจาก Hub มาเก็บไว้ในเครื่อง
+- ใช้ `sync-snapshot` เพื่อส่งข้อมูล SQL จากเครื่องกลับไปอัปเดตบน Hub
+
+---
+
+## 5. 🤖 AI Handshake Protocol (Golden Prompt)
+เมื่อคุณต้องการให้ AI (เช่น ChatGPT, Claude, หรือ Antigravity) เริ่มทำงานในโปรเจกต์ใหม่ (เช่น `kyx-infra`) ให้ใช้คำสั่งนี้เสมอ:
+
+> **AI Handshake Instruction:**
+> \"โปรเจกต์นี้เป็นส่วนหนึ่งของ Kyx Ecosystem คุณมี MCP Tools สำหรับ Governance และ Standards ให้ใช้งาน
+> **กรุณาดำเนินการตามลำดับนี้ก่อนเริ่มงาน:**
+> 1. ตรวจสอบกฎการทำงาน: รัน `list-active-rules(project=\'kyx-infra\')`
+> 2. อ่านเอกสารที่เกี่ยวข้อง: รัน `list-documents(project=\'kyx-infra\')`
+> 3. ตรวจสอบปัญหาที่เคยเจอ: รัน `search-governance(query=\'kyx-infra\')`
+> 4. ปฏิบัติตามมาตรฐานที่กำหนดไว้อย่างเคร่งครัด หากพบปัญหาให้บันทึกผ่าน `report-incident` ทันที\"
+
+### ทำไมถึงต้องทำแบบนี้?
+1. **Auto-Context**: AI จะเข้าใจทันทีว่าต้องไปหา \"ความจริง\" จากที่ไหน ไม่ต้องเดา
+2. **Standard Enforcement**: AI จะไม่เขียนโค้ดที่ขัดกับกฎบริษัท (เช่น ลืมใส่ Audit Log หรือรัน Migration ผิดวิธี)
+3. **Continuous Indexing**: AI จะสามารถดึงข้อมูลข้ามโปรเจกต์ได้ (Cross-project knowledge)' };
 UPSERT mcp_documentation:1zh3rrs7wx32zpypfygk CONTENT { name: 'deployment', title: 'Deployment Guide', sdlc_phase: 'maintenance', mimeType: 'text/markdown', project_id: mcp_projects:governance, content: '# Deployment Guide... (Verified)' };
 UPSERT mcp_documentation:bjk9vkch97qmow5oez78 CONTENT { name: 'project-workflow-status', title: 'Master Workflow: Kyx Governance Hub', sdlc_phase: 'maintenance', mimeType: 'text/markdown', project_id: mcp_projects:governance, content: '# Master Workflow: Kyx Governance Hub... (Verified)' };
 UPSERT mcp_documentation:5qzgyn5i94pju3n13eg8 CONTENT { name: 'test-plan', title: 'Test Plan', sdlc_phase: 'verification', mimeType: 'text/markdown', project_id: mcp_projects:governance, content: '# Verification Plan... (Verified)' };
