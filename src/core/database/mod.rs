@@ -4,6 +4,7 @@ use anyhow::Result;
 use crate::core::config::Config;
 
 pub mod seeder;
+pub mod vector;
 pub type Database = Surreal<Any>;
 
 pub async fn connect(config: &Config) -> Result<Database> {

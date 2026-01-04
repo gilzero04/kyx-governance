@@ -24,30 +24,39 @@ pub struct ResourceContent {
 pub struct Tool {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing)]
     pub title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub description: String,
     #[serde(alias = "input_schema")]
-    pub input_schema: Value,
+    pub input_schema: serde_json::Value,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(alias = "execution_type")]
+    #[serde(skip_serializing)]
     pub execution_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(alias = "sql_template")]
+    #[serde(skip_serializing)]
     pub sql_template: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(alias = "parameter_map")]
-    pub parameter_map: Option<Value>,
+    #[serde(skip_serializing)]
+    pub parameter_map: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(alias = "project_id")]
+    #[serde(skip_serializing)]
+    pub project_id: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CallToolResult {
     pub content: Vec<ToolContent>,
-    #[serde(rename = "isError")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_error: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToolContent {
     #[serde(rename = "type")]
     pub content_type: String,

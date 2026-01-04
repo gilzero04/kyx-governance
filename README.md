@@ -8,6 +8,7 @@ The **Kyx Model Context Protocol (MCP) Server** is the central governance and in
 - **Project Index**: `list-projects`, `list-tech-stack`
 - **Incident Management**: `count-incidents`, `report-incident` (Dynamic Tool)
 - **Database-Driven Logic**: Architecture stores rules and tools in SurrealDB for dynamic updates.
+- **Detailed Documentation**: See our [Internal Documentation (docs/README.md)](./docs/README.md) for technical walkthroughs.
 
 ## Getting Started
 

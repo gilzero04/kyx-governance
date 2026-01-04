@@ -24,6 +24,8 @@ services:
       - SURREAL_DATABASE=${SURREAL_DATABASE:-governance}
       # Authentication
       - MCP_API_KEY=${MCP_API_KEY}
+      - QDRANT_URL=http://qdrant:6333
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       surrealdb:
         condition: service_healthy
@@ -59,9 +61,28 @@ services:
       retries: 5
       start_period: 5s
 
+  # Qdrant for Vector Storage
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: kyx-governance-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_PORT:-6335}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - kyx-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   kyx-network:
     driver: bridge
 
 volumes:
   surreal-data:
+  qdrant-data:

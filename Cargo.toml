@@ -28,7 +28,16 @@ thiserror = "1.0"
 log = "0.4"
 env_logger = "0.11"
 dotenvy = "0.15"
+reqwest = { version = "0.12", features = ["json", "native-tls", "http2"] }
 
 # MCP Logic
 serde_repr = "0.1"
 url = "2.0"
+
+# Rate Limiting
+governor = "0.6"
+nonzero_ext = "0.3"
+
+# Monitoring & Metrics
+prometheus = "0.13"
+lazy_static = "1.4"

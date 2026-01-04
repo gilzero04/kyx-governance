@@ -70,7 +70,6 @@ EXPOSE 3001
 USER kyx
 
 # Set default environment variables
-ENV MCP_TRANSPORT=hybrid
 ENV MIGRATION_DIR=/migrations
 ENV PORT=3001
 ENV RUST_LOG=info

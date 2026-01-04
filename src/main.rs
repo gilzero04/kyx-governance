@@ -9,6 +9,8 @@ use std::sync::Arc;
 async fn main() -> std::io::Result<()> {
     // 1. Load Environment Variables
     dotenvy::dotenv().ok();
+    
+    // Initialize logging
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
         .target(env_logger::Target::Stderr)
         .init();
@@ -26,35 +28,29 @@ async fn main() -> std::io::Result<()> {
         }
     };
     log::info!("✅ Connected to SurrealDB: {}/{}", config.surreal_ns, config.surreal_db);
+    
+    // 3. Initialize Vector Store (Phase 3)
+    let vector = match crate::core::database::vector::VectorStore::new(&config).await {
+        Ok(v) => Arc::new(v),
+        Err(e) => {
+            log::error!("❌ Failed to initialize Vector Store: {}", e);
+            return Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()));
+        }
+    };
+    log::info!("✅ Connected to Qdrant: {}", config.qdrant_url);
+
+    // 3.5. Initialize Prometheus Metrics
+    crate::core::metrics::init_metrics();
 
     // 4. Run Migrations (Non-fatal)
     if let Err(e) = crate::core::database::seeder::apply_migrations(&db).await {
         log::warn!("⚠️  Migration check failed (non-fatal): {}", e);
     }
 
-    // 3. Determine Mode (Stdio, HTTP, or Hybrid)
-    let transport_mode = std::env::var("MCP_TRANSPORT").unwrap_or_else(|_| "stdio".to_string());
-
-    match transport_mode.as_str() {
-        "stdio" => {
-            log::info!("📟 Mode: Stdio only");
-            transport::run_stdio_loop((*db).clone()).await?;
-        },
-        "http" => {
-            log::info!("🌐 Mode: HTTP only");
-            let config = Arc::new(config);
-            transport::run_http_server(config.port, db, config).await?;
-        },
-        "hybrid" => {
-            log::info!("🔀 Mode: Hybrid (Stdio + HTTP)");
-            let config = Arc::new(config);
-            transport::run_hybrid(config.clone(), db, config).await?;
-        },
-        _ => {
-            log::warn!("⚠️ Unknown transport '{}', defaulting to stdio", transport_mode);
-            transport::run_stdio_loop((*db).clone()).await?;
-        }
-    }
+    // 5. Start HTTP Server
+    log::info!("🌐 Mode: HTTP only");
+    let config = Arc::new(config);
+    transport::run_http_server(config.port, db, vector, config).await?;
 
     Ok(())
 }

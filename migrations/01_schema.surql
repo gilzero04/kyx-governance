@@ -32,18 +32,18 @@ DEFINE INDEX doc_name ON mcp_documentation FIELDS project_id, sdlc_phase, name U
 
 -- 3. Tools Registry (Static & Dynamic)
 -- ------------------------------------
-DEFINE TABLE OVERWRITE mcp_tool SCHEMALESS;
-DEFINE FIELD name ON mcp_tool TYPE string;
-DEFINE FIELD description ON mcp_tool TYPE string;
-DEFINE FIELD input_schema ON mcp_tool TYPE object;
-DEFINE FIELD enabled ON mcp_tool TYPE bool DEFAULT true;
-DEFINE FIELD project_id ON mcp_tool TYPE record<mcp_projects> VALUE $value OR none;
-DEFINE FIELD execution_type ON TABLE mcp_tool TYPE string DEFAULT 'static' ASSERT $value INSIDE ['static', 'dynamic_sql', 'raw_sql'];
-DEFINE FIELD sql_template ON TABLE mcp_tool TYPE string DEFAULT '';
-DEFINE FIELD parameter_map ON TABLE mcp_tool TYPE object DEFAULT {};
-DEFINE FIELD created_at ON mcp_tool TYPE datetime DEFAULT time::now();
-DEFINE FIELD updated_at ON mcp_tool TYPE datetime DEFAULT time::now();
-DEFINE INDEX tool_name ON mcp_tool FIELDS name UNIQUE;
+DEFINE TABLE OVERWRITE mcp_tools SCHEMALESS;
+DEFINE FIELD name ON mcp_tools TYPE string;
+DEFINE FIELD description ON mcp_tools TYPE string;
+DEFINE FIELD input_schema ON mcp_tools TYPE object;
+DEFINE FIELD active ON mcp_tools TYPE bool DEFAULT true;
+DEFINE FIELD project_id ON mcp_tools TYPE record<mcp_projects> VALUE $value OR none;
+DEFINE FIELD execution_type ON TABLE mcp_tools TYPE string DEFAULT 'static' ASSERT $value INSIDE ['static', 'dynamic_sql', 'raw_sql'];
+DEFINE FIELD sql_template ON TABLE mcp_tools TYPE string DEFAULT '';
+DEFINE FIELD parameter_map ON TABLE mcp_tools TYPE object DEFAULT {};
+DEFINE FIELD created_at ON mcp_tools TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated_at ON mcp_tools TYPE datetime DEFAULT time::now();
+DEFINE INDEX tool_name ON mcp_tools FIELDS name UNIQUE;
 
 -- 4. Governance Rules
 -- -------------------
@@ -79,3 +79,14 @@ DEFINE FIELD layout_definition ON ui_layouts TYPE object; -- JSON definition for
 DEFINE FIELD created_at ON ui_layouts TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON ui_layouts TYPE datetime DEFAULT time::now();
 DEFINE INDEX ui_route_idx ON ui_layouts FIELDS project_id, route_name UNIQUE;
+
+-- 7. Audit Logging
+-- ----------------
+DEFINE TABLE OVERWRITE mcp_audit_log SCHEMAFULL;
+DEFINE FIELD tool_name ON mcp_audit_log TYPE string;
+DEFINE FIELD project_id ON mcp_audit_log TYPE record<mcp_projects> VALUE $value OR none;
+DEFINE FIELD arguments ON mcp_audit_log TYPE object DEFAULT {};
+DEFINE FIELD status ON mcp_audit_log TYPE string ASSERT $value INSIDE ['success', 'error'];
+DEFINE FIELD message ON mcp_audit_log TYPE string DEFAULT '';
+DEFINE FIELD duration_ms ON mcp_audit_log TYPE int DEFAULT 0;
+DEFINE FIELD executed_at ON mcp_audit_log TYPE datetime DEFAULT time::now();

@@ -6,7 +6,7 @@ BEGIN TRANSACTION;
 -- Wipe existing data for clean seed
 DELETE ai_rules;
 DELETE mcp_documentation;
-DELETE mcp_tool;
+DELETE mcp_tools;
 DELETE mcp_incident;
 DELETE mcp_projects;
 

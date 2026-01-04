@@ -12,6 +12,11 @@ pub struct Config {
     pub mcp_api_key: Option<String>,
     #[allow(dead_code)]
     pub jwt_secret: String,
+    
+    // Vector Search (Phase 3)
+    pub qdrant_url: String,
+    pub openai_api_key: String,
+    pub embedding_model: String,
 }
 
 impl Config {
@@ -32,6 +37,11 @@ impl Config {
             // Optional: if set, requires Bearer token authentication
             mcp_api_key: env::var("MCP_API_KEY").ok().filter(|s| !s.is_empty()),
             jwt_secret: env::var("JWT_SECRET").unwrap_or_else(|_| "dev-secret".to_string()),
+            
+            // Vector Search (Phase 3)
+            qdrant_url: env::var("QDRANT_URL").unwrap_or_else(|_| "http://127.0.0.1:6333".to_string()),
+            openai_api_key: env::var("OPENAI_API_KEY").unwrap_or_else(|_| "sk-placeholder".to_string()),
+            embedding_model: env::var("EMBEDDING_MODEL").unwrap_or_else(|_| "text-embedding-3-small".to_string()),
         }
     }
     
