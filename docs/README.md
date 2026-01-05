@@ -1,14 +1,34 @@
-# Project Documentation
+# README: kyx-governance (Docs Index)
 
-Welcome to the Kyx Governance documentation. This directory contains technical guides, walkthroughs, and design documents.
+project_id: kyx-governance
+author: Antigravity
+created_by: ai
+ai_prompt: "Mapping the documentation directory indexing"
+ai_confidence: 0.99
+last_updated: 2026-01-05
 
-## Walkthroughs
+## 🧭 Reader Orientation
 
-Detailed guides on major feature implementations:
+- **Target Audience**: Anyone browsing the `docs/` folder.
+- **Purpose**: Direct index to the 11 mandatory technical contracts.
 
-- [Phase 2: Audit Logging (02-audit-logging.md)](./walkthroughs/02-audit-logging.md) - Implementation of the audit trail system and SurrealDB 2.x serialization solutions.
+## Summary & Prime Directive
 
-## Architecture
+**WHAT**: สารบัญเอกสารมาตรฐาน v3
+**WHY**: เพื่อให้ค้นหาเอกสารที่ต้องการได้รวดเร็ว
+**HOW**: ลิงก์ไปยัง 11 เอกสารหลักในโฟลเดอร์นี้
 
-- [Database Schema](../migrations/01_schema.surql) - Table definitions and relationships.
-- [McpHandler](../src/core/mcp/handler.rs) - Core logic for tool execution and auditing.
+## Analysis & Decisions
+
+- **Decision Record**: ทุกไฟล์ในโฟลเดอร์นี้ต้องทำตาม v3 linter.
+
+## Capability Traceability
+
+| Capability   | Technical Mechanism | Infrastructure   | Source Signature |
+| :----------- | :------------------ | :--------------- | :--------------- |
+| Doc Indexing | Markdown Links      | local filesystem | ./docs/README.md |
+
+## Invariants & Failure Modes
+
+- **Invariant**: สารบัญต้องสะท้อนไฟล์จริงที่มีอยู่
+- **Mode**: Broken Link (Prevention: Automated Link check).
