@@ -9,8 +9,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: kyx-governance:latest
-    container_name: kyx-governance
+    image: kyx/governance
+    container_name: kyx-governance-app
     restart: unless-stopped
     ports:
       - "${PORT:-3001}:3001"
@@ -47,6 +47,8 @@ services:
     command: start --user ${SURREAL_USER:-root} --pass ${SURREAL_PASS:-c31256bbba78c60c09cfa90c65fb533b96fd1bb27a22be2f} rocksdb:/var/lib/surreal/data.db
     volumes:
       - surreal-data:/var/lib/surreal
+      - surreal-data:/data
+      - surreal-logs:/logs # <--- Fix anonymous volumes here too!
     ports:
       - "${SURREAL_PORT:-8000}:8000"
     environment:
@@ -85,4 +87,5 @@ networks:
 
 volumes:
   surreal-data:
+  surreal-logs:
   qdrant-data:
