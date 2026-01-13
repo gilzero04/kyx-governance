@@ -139,10 +139,16 @@ impl McpHandler {
             });
         }
 
+        let mut flattened_tools = Vec::new();
+        for mut tool in tools {
+            tool.input_schema = flatten_v(tool.input_schema);
+            flattened_tools.push(tool);
+        }
+
         Ok(JsonRpcResponse {
             jsonrpc: "2.0".to_string(),
             id: req.id.unwrap_or(json!(null)),
-            result: Some(json!({ "tools": tools })),
+            result: Some(json!({ "tools": flattened_tools })),
             error: None,
         })
     }
@@ -372,30 +378,6 @@ impl McpHandler {
                     }
                 }
 
-                // Helper to flatten SurrealDB 2.x ENUM-style serialization
-                fn flatten_v(v: serde_json::Value) -> serde_json::Value {
-                    match v {
-                        serde_json::Value::Object(mut map) => {
-                            if map.len() == 1 {
-                                let key = map.keys().next().unwrap().clone();
-                                if ["Array", "Object", "Strand", "Number", "Bool", "Record"].contains(&key.as_str()) {
-                                    let inner = map.remove(&key).unwrap();
-                                    return flatten_v(inner);
-                                }
-                            }
-                            let mut new_map = serde_json::Map::new();
-                            for (k, v) in map {
-                                new_map.insert(k, flatten_v(v));
-                            }
-                            serde_json::Value::Object(new_map)
-                        },
-                        serde_json::Value::Array(arr) => {
-                            serde_json::Value::Array(arr.into_iter().map(flatten_v).collect())
-                        },
-                        _ => v
-                    }
-                }
-
                 let final_results: Vec<serde_json::Value> = all_results.into_iter().map(flatten_v).collect();
                 
                 let text_output = if final_results.len() == 1 && final_results[0].is_string() {
@@ -511,30 +493,6 @@ impl McpHandler {
                             if !val.is_null() {
                                 all_results.push(val);
                             }
-                        }
-                    }
-
-                    // Helper to flatten SurrealDB 2.x ENUM-style serialization
-                    fn flatten_v(v: serde_json::Value) -> serde_json::Value {
-                        match v {
-                            serde_json::Value::Object(mut map) => {
-                                if map.len() == 1 {
-                                    let key = map.keys().next().unwrap().clone();
-                                    if ["Array", "Object", "Strand", "Number", "Bool", "Record"].contains(&key.as_str()) {
-                                        let inner = map.remove(&key).unwrap();
-                                        return flatten_v(inner);
-                                    }
-                                }
-                                let mut new_map = serde_json::Map::new();
-                                for (k, v) in map {
-                                    new_map.insert(k, flatten_v(v));
-                                }
-                                serde_json::Value::Object(new_map)
-                            },
-                            serde_json::Value::Array(arr) => {
-                                serde_json::Value::Array(arr.into_iter().map(flatten_v).collect())
-                            },
-                            _ => v
                         }
                     }
 
@@ -710,5 +668,29 @@ impl McpHandler {
             }),
             req.id.clone()
         ))
+    }
+}
+
+/// Helper to flatten SurrealDB 2.x ENUM-style serialization (e.g., {"Strand": "val"} -> "val")
+fn flatten_v(v: serde_json::Value) -> serde_json::Value {
+    match v {
+        serde_json::Value::Object(mut map) => {
+            if map.len() == 1 {
+                let key = map.keys().next().unwrap().clone();
+                if ["Array", "Object", "Strand", "Number", "Bool", "Record", "Uuid", "Datetime"].contains(&key.as_str()) {
+                    let inner = map.remove(&key).unwrap();
+                    return flatten_v(inner);
+                }
+            }
+            let mut new_map = serde_json::Map::new();
+            for (k, v) in map {
+                new_map.insert(k, flatten_v(v));
+            }
+            serde_json::Value::Object(new_map)
+        },
+        serde_json::Value::Array(arr) => {
+            serde_json::Value::Array(arr.into_iter().map(flatten_v).collect())
+        },
+        _ => v
     }
 }
